@@ -1,10 +1,10 @@
 """
-AI Solver - FAST VERSION with PaddleOCR + Phi-3
-No slow vision models - pure speed!
+AI Solver - SUPER FAST VERSION with Tesseract + Phi-3
+Minimal dependencies, maximum speed!
 """
 
 import ollama
-from paddleocr import PaddleOCR
+import pytesseract
 from PIL import Image
 from pathlib import Path
 import time
@@ -13,32 +13,19 @@ class FastAISolver:
     def __init__(self):
         print("🚀 Initializing Fast AI Solver...")
         
-        # Initialize PaddleOCR (fast and accurate!)
-        print("📝 Loading PaddleOCR...")
-        self.ocr = PaddleOCR(use_angle_cls=True, lang='en')
-
-        
         # Use Phi-3 for answering
         self.model = 'phi3'
         
-        print(f"✅ Ready! Using {self.model} for answers")
+        print(f"✅ Ready! Using Tesseract OCR + {self.model}")
     
     def extract_text(self, image_path):
-        """Extract text from image using PaddleOCR (FAST!)"""
+        """Extract text from image using Tesseract (INSTANT!)"""
         try:
             # Run OCR
-            result = self.ocr.ocr(str(image_path), cls=True)
+            img = Image.open(image_path)
+            text = pytesseract.image_to_string(img)
             
-            if not result or not result[0]:
-                return ""
-            
-            # Extract all text
-            texts = []
-            for line in result[0]:
-                if line[1][0]:  # text exists
-                    texts.append(line[1][0])
-            
-            return " ".join(texts)
+            return text.strip()
             
         except Exception as e:
             print(f"❌ OCR error: {e}")
