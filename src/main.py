@@ -10,10 +10,20 @@ from pathlib import Path
 import keyboard
 from PIL import ImageGrab, ImageTk, Image
 import time
+import sys
+import os
 
-# Import our modules
-from solver_ai import FastAISolver  # Changed to FastAISolver
-from scr import ScreenshotOverlay
+# Add current directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Import our modules (try both ways)
+try:
+    from solver_ai import FastAISolver
+    from scr import ScreenshotOverlay
+except ImportError:
+    # If running from parent directory
+    from src.solver_ai import FastAISolver
+    from src.scr import ScreenshotOverlay
 
 
 class ScreenAIApp:
@@ -65,7 +75,7 @@ class ScreenAIApp:
             bg="#4A90E2",
             fg="white",
             activebackground="#357ABD",
-            command=self.trigger_capture,
+            command=self.capture_and_process,  # Changed to auto-process
             height=3,
             cursor="hand2"
         )
@@ -157,16 +167,22 @@ class ScreenAIApp:
         self.status_var.set("📸 Capturing screen...")
         
         def capture():
-            self.overlay = ScreenshotOverlay()
-            self.overlay.start_capture()
+            # Create new overlay instance
+            overlay = ScreenshotOverlay()
+            overlay.start_capture()
             
-            # After capture, check if auto-process is enabled
-            if self.auto_process_var.get():
-                self.root.after(500, self.process_last_screenshot)
-            
-            self.update_stats()
+            # After capture completes, process if auto-process is enabled
+            self.root.after(1000, self.check_and_process)
         
         threading.Thread(target=capture, daemon=True).start()
+    
+    def check_and_process(self):
+        """Check for new screenshot and process if auto-process enabled"""
+        if self.auto_process_var.get():
+            # Small delay to ensure file is saved
+            self.root.after(500, self.process_last_screenshot)
+        
+        self.update_stats()
     
     def process_last_screenshot(self):
         """Process the most recent screenshot"""
