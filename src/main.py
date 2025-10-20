@@ -75,7 +75,7 @@ class ScreenAIApp:
             bg="#4A90E2",
             fg="white",
             activebackground="#357ABD",
-            command=self.capture_and_process,  # Changed to auto-process
+            command=self.check_and_process,  # Changed to auto-process
             height=3,
             cursor="hand2"
         )
