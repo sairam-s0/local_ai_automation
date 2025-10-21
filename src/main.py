@@ -1,7 +1,4 @@
-"""
-Screen AI Assistant - Main Application
-Combines screenshot capture + AI processing
-"""
+
 
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox
@@ -16,7 +13,6 @@ import os
 # Add current directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Import our modules (try both ways)
 try:
     from solver_ai import FastAISolver
     from scr import ScreenshotOverlay
@@ -32,7 +28,7 @@ class ScreenAIApp:
         self.root.title("Screen AI Assistant 🤖")
         self.root.geometry("800x600")
         
-        # Initialize components with proper paths
+        
         self.base_dir = Path(__file__).resolve().parent
         self.screenshots_dir = self.base_dir / "screenshots"
         self.screenshots_dir.mkdir(exist_ok=True)
@@ -42,16 +38,15 @@ class ScreenAIApp:
         self.current_screenshot = None
         self._last_hotkey_time = 0
         
-        # Setup UI
+        
         self.setup_ui()
         
-        # Setup hotkey with proper options
+        # Setup hotkey
         keyboard.add_hotkey('ctrl+shift+s', self.trigger_capture, 
                           suppress=True, trigger_on_release=True)
 
     def setup_ui(self):
-        """Setup the main UI"""
-        # Title
+
         title = tk.Label(
             self.root,
             text="📸 Screen AI Assistant",
@@ -62,7 +57,7 @@ class ScreenAIApp:
         )
         title.pack(fill=tk.X)
         
-        # Main container
+        # 
         main_frame = ttk.Frame(self.root, padding=10)
         main_frame.pack(fill=tk.BOTH, expand=True)
         
@@ -78,7 +73,7 @@ class ScreenAIApp:
             bg="#4A90E2",
             fg="white",
             activebackground="#357ABD",
-            command=self.check_and_process,  # Changed to auto-process
+            command=self.check_and_process,  
             height=3,
             cursor="hand2"
         )
@@ -115,7 +110,7 @@ class ScreenAIApp:
         settings_label.pack(pady=5)
         
         # Auto-process toggle
-        self.auto_process_var = tk.BooleanVar(value=True)  # Default ON for speed!
+        self.auto_process_var = tk.BooleanVar(value=True) 
         auto_check = ttk.Checkbutton(
             left_panel,
             text="Auto-process captures",
@@ -174,7 +169,7 @@ class ScreenAIApp:
         self._last_hotkey_time = now
 
         self.status_var.set("📸 Capturing screen...")
-        # Schedule capture in main thread
+        # Schedule capture 
         self.root.after(0, self._start_overlay_capture)
     
     def _start_overlay_capture(self):
