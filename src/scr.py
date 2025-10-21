@@ -12,7 +12,8 @@ import time
 from pathlib import Path
 
 class ScreenshotOverlay:
-    def __init__(self):
+    def __init__(self, parent=None):
+        self.parent = parent
         self.root = None
         self.canvas = None
         self.start_x = None
@@ -20,26 +21,29 @@ class ScreenshotOverlay:
         self.rect = None
         self.screenshot = None
         self.is_active = False
+        self.last_saved_path = None
         
-        # Create screenshots folder
-        Path("screenshots").mkdir(exist_ok=True)
+        # Create screenshots folder relative to script
+        self.base_dir = Path(__file__).resolve().parent
+        self.screenshots_dir = self.base_dir / "screenshots"
+        self.screenshots_dir.mkdir(exist_ok=True)
         
     def start_capture(self):
         """Initialize the overlay for screenshot capture"""
         if self.is_active:
-            return
+            return None
             
         self.is_active = True
         
+        # Take screenshot before creating overlay
+        self.screenshot = ImageGrab.grab()
+        
         # Create fullscreen transparent window
-        self.root = tk.Tk()
+        self.root = tk.Toplevel(self.parent) if self.parent else tk.Tk()
         self.root.attributes('-fullscreen', True)
         self.root.attributes('-alpha', 0.3)
         self.root.attributes('-topmost', True)
         self.root.configure(bg='black')
-        
-        # Take screenshot of entire screen
-        self.screenshot = ImageGrab.grab()
         
         # Create canvas
         self.canvas = tk.Canvas(
@@ -50,12 +54,10 @@ class ScreenshotOverlay:
         )
         self.canvas.pack(fill=tk.BOTH, expand=True)
         
-        # Bind mouse events
+        # Bind events
         self.canvas.bind("<ButtonPress-1>", self.on_press)
         self.canvas.bind("<B1-Motion>", self.on_drag)
         self.canvas.bind("<ButtonRelease-1>", self.on_release)
-        
-        # Bind ESC to cancel
         self.root.bind("<Escape>", lambda e: self.cancel())
         
         # Instructions
@@ -68,8 +70,12 @@ class ScreenshotOverlay:
         )
         label.place(relx=0.5, rely=0.02, anchor="n")
         
-        self.root.mainloop()
-    
+        # Make modal
+        self.root.grab_set()
+        self.root.wait_window(self.root)
+        
+        return self.last_saved_path
+
     def on_press(self, event):
         """Mouse press - start selection"""
         self.start_x = event.x
@@ -104,11 +110,12 @@ class ScreenshotOverlay:
         # Crop screenshot
         cropped = self.screenshot.crop((x1, y1, x2, y2))
         
-        # Save with timestamp
+        # Save with timestamp using absolute path
         timestamp = time.strftime("%Y%m%d_%H%M%S")
-        filepath = f"screenshots/capture_{timestamp}.png"
+        filepath = self.screenshots_dir / f"capture_{timestamp}.png"
         cropped.save(filepath)
         
+        self.last_saved_path = str(filepath)
         print(f"\n✅ Screenshot saved: {filepath}")
         
         # Close overlay

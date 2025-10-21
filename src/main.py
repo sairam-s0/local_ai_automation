@@ -32,20 +32,23 @@ class ScreenAIApp:
         self.root.title("Screen AI Assistant 🤖")
         self.root.geometry("800x600")
         
-        # Initialize components
-        self.solver = FastAISolver()  # No parameters needed
-        self.overlay = ScreenshotOverlay()
+        # Initialize components with proper paths
+        self.base_dir = Path(__file__).resolve().parent
+        self.screenshots_dir = self.base_dir / "screenshots"
+        self.screenshots_dir.mkdir(exist_ok=True)
+        
+        self.solver = FastAISolver()
+        self.overlay = ScreenshotOverlay(parent=self.root)  # Pass parent
         self.current_screenshot = None
+        self._last_hotkey_time = 0
         
         # Setup UI
         self.setup_ui()
         
-        # Setup hotkey
-        keyboard.add_hotkey('ctrl+shift+s', self.trigger_capture)
-        
-        # Create folders
-        Path("screenshots").mkdir(exist_ok=True)
-    
+        # Setup hotkey with proper options
+        keyboard.add_hotkey('ctrl+shift+s', self.trigger_capture, 
+                          suppress=True, trigger_on_release=True)
+
     def setup_ui(self):
         """Setup the main UI"""
         # Title
@@ -164,18 +167,26 @@ class ScreenAIApp:
     
     def trigger_capture(self):
         """Trigger screenshot capture"""
+        # Debounce check
+        now = time.time()
+        if now - self._last_hotkey_time < 0.5:
+            return
+        self._last_hotkey_time = now
+
         self.status_var.set("📸 Capturing screen...")
-        
-        def capture():
-            # Create new overlay instance
-            overlay = ScreenshotOverlay()
-            overlay.start_capture()
-            
-            # After capture completes, process if auto-process is enabled
-            self.root.after(1000, self.check_and_process)
-        
-        threading.Thread(target=capture, daemon=True).start()
+        # Schedule capture in main thread
+        self.root.after(0, self._start_overlay_capture)
     
+    def _start_overlay_capture(self):
+        """Start capture in main thread"""
+        if self.overlay.is_active:
+            return
+        
+        filepath = self.overlay.start_capture()
+        if filepath and self.auto_process_var.get():
+            self.process_specific_screenshot(filepath)
+        self.update_stats()
+
     def check_and_process(self):
         """Check for new screenshot and process if auto-process enabled"""
         if self.auto_process_var.get():
@@ -206,6 +217,20 @@ class ScreenAIApp:
         
         threading.Thread(target=process, daemon=True).start()
     
+    def process_specific_screenshot(self, filepath):
+        """Process a specific screenshot file"""
+        filepath = Path(filepath)
+        self.current_screenshot = filepath
+        self.status_var.set(f"🤖 Processing {filepath.name}...")
+        self.results_text.delete(1.0, tk.END)
+        self.results_text.insert(1.0, "⏳ Processing with AI...\n\n")
+
+        def process():
+            result = self.solver.solve(filepath)
+            self.root.after(0, lambda: self.display_result(result, filepath.name))
+
+        threading.Thread(target=process, daemon=True).start()
+
     def batch_process(self):
         """Process all screenshots in batch"""
         screenshots = list(Path("screenshots").glob("*.png"))
