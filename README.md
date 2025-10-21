@@ -1,4 +1,4 @@
-# webslover
+# cam slover
 # setup
 ### you need to set up phi min for using this application first 
 
