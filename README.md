@@ -86,16 +86,16 @@ Future versions will include:
 
 ---
 
-## 🚧 Current Status (Active Development)
+##  Current Status (Active Development)
 
 | Component              | Status         |
 | ---------------------- | -------------- |
-| Phi-4 Mini AI          | ✅ Working      |
-| Screenshot Capture     | ✅ Working      |
-| OCR Text Extraction    | ✅ Stable       |
-| AI Answer Generation   | ✅ Functional   |
-| Automation Integration | ⚙️ In progress |
-| Full Workflow Docs     | 📄 Coming soon |
+| Phi-4 Mini AI          | Working      |
+| Screenshot Capture     | Working      |
+| OCR Text Extraction    | ISSUE       |
+| AI Answer Generation   | Functional   |
+| Automation Integration | In progress |
+| Full Workflow Docs     | Coming soon |
 
 ---
 
