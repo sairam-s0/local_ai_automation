@@ -1,7 +1,4 @@
-"""
-Screenshot Capture Overlay - Like Grammarly for Screen AI
-Hotkey: Press Ctrl+Shift+S to capture screen area
-"""
+
 
 import tkinter as tk
 from tkinter import messagebox
@@ -201,11 +198,11 @@ class FloatingButton:
 
 
 def main():
-    """Main function - Setup hotkey and floating button"""
+
     overlay = ScreenshotOverlay()
     
     def capture_hotkey():
-        """Handle hotkey press"""
+        
         print("\n🎯 Screenshot mode activated!")
         threading.Thread(target=overlay.start_capture, daemon=True).start()
     
