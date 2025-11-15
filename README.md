@@ -55,16 +55,7 @@ After installation, just type your questions and press Enter. For example:
 **Note:** First download takes a few minutes depending on your internet speed.
 Perfect — your thinking is spot on.
 
-At this stage, your **README should stay lightweight and focused on clarity + setup**. You don’t want to clutter it with every implementation detail yet, especially since your OCR + automation pipeline is still evolving.
 
-Here’s what I’d recommend:
-✅ **Keep the setup + install section exactly as you wrote it** — it’s clean, clear, and easy to follow.
-✅ Add a **“Project Overview”** section briefly explaining what the automation does now (the screenshot-to-AI pipeline).
-✅ Update the **“Current Status”** section to reflect the *current working flow* and note that detailed documentation will come after full stabilization.
-
-Here’s a refined version you can paste in directly:
-
----
 
 
 ## 🧰 Project Overview
